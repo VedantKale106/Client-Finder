@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Client Finder – Lead Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+/* ── Reset & Base ──────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080808;
+  --surface:#0f0f0f;
+  --glass:rgba(255,255,255,.025);
+  --border:rgba(212,175,55,.15);
+  --border-strong:rgba(212,175,55,.45);
+  --gold:#d4af37;
+  --gold-light:#f0d060;
+  --gold-dim:#a8892a;
+  --gold-glow:rgba(212,175,55,.2);
+  --text:#f0ebe0;
+  --muted:#9a8c6e;
+  --muted2:#50493a;
+  --danger:#cc4444;
+  --success:#4a9e5c;
+  --radius:14px;
+  --radius-sm:8px;
+  --shadow:0 24px 64px rgba(0,0,0,.85);
+}
+html{font-size:15px;scroll-behavior:smooth}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  background-image:
+    radial-gradient(ellipse 70% 40% at 15% 0%,rgba(212,175,55,.06) 0%,transparent 55%),
+    radial-gradient(ellipse 50% 30% at 85% 100%,rgba(212,175,55,.04) 0%,transparent 55%);
+}
+
+/* ── Layout ────────────────────────────────────────── */
+.container{width:100%;max-width:1340px;padding:2.5rem 1.5rem}
+
+/* ── Header ────────────────────────────────────────── */
+header{text-align:center;margin-bottom:3rem}
+.logo-wrap{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:66px;height:66px;
+  background:linear-gradient(145deg,#1c1600,#2c2200);
+  border:1px solid var(--border-strong);
+  border-radius:16px;margin-bottom:1.25rem;
+  box-shadow:0 0 32px var(--gold-glow),0 8px 32px rgba(0,0,0,.6);
+}
+/* Search icon in logo */
+.logo-wrap svg{color:var(--gold)}
+header h1{
+  font-size:2.4rem;font-weight:900;letter-spacing:-1px;
+  background:linear-gradient(135deg,var(--gold-dim) 0%,var(--gold) 45%,var(--gold-light) 100%);
+  background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1.15;
+}
+.header-rule{
+  width:72px;height:1.5px;margin:.75rem auto .6rem;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+header p{color:var(--muted);font-size:.92rem;line-height:1.6}
+
+/* ── Search Card ───────────────────────────────────── */
+.search-card{
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:1.75rem 2rem 1.5rem;
+  box-shadow:var(--shadow),0 0 0 1px rgba(212,175,55,.04) inset;
+  margin-bottom:2rem;
+  position:relative;overflow:hidden;
+}
+.search-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent 10%,var(--gold-dim) 40%,rgba(212,175,55,.6) 50%,var(--gold-dim) 60%,transparent 90%);
+}
+.card-label{
+  font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;
+  color:var(--gold-dim);margin-bottom:1.4rem;
+  display:flex;align-items:center;gap:.5rem;
+}
+.card-label-bar{width:3px;height:11px;background:linear-gradient(var(--gold),var(--gold-dim));border-radius:2px}
+
+/* ── Fields Grid ───────────────────────────────────── */
+.fields-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr auto;
+  gap:1rem;align-items:end;
+}
+@media(max-width:900px){.fields-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.fields-grid{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:.4rem}
+.field label{
+  font-weight:600;font-size:.67rem;text-transform:uppercase;
+  letter-spacing:1px;color:var(--muted);
+  display:flex;align-items:center;gap:.4rem;
+}
+.field label svg{color:var(--gold-dim);flex-shrink:0}
+.field input{
+  width:100%;
+  background:rgba(0,0,0,.55);
+  border:1px solid rgba(212,175,55,.18);
+  color:var(--text);
+  border-radius:var(--radius-sm);
+  padding:.72rem 1rem;
+  font-size:.93rem;font-family:inherit;
+  outline:none;
+  transition:border-color .2s,box-shadow .2s,background .2s;
+}
+.field input::placeholder{color:var(--muted2)}
+.field input:focus{
+  border-color:var(--gold-dim);
+  background:rgba(212,175,55,.04);
+  box-shadow:0 0 0 3px rgba(212,175,55,.09);
+}
+.field input.invalid{
+  border-color:var(--danger);
+  animation:shake .4s ease;
+}
+
+/* ── Quick Tags ────────────────────────────────────── */
+.quick-tags{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.5rem}
+.tag{
+  font-size:.68rem;font-weight:600;
+  padding:.18rem .6rem;border-radius:99px;
+  background:rgba(212,175,55,.04);
+  border:1px solid rgba(212,175,55,.15);
+  color:var(--muted);cursor:pointer;transition:all .15s;
+  user-select:none;letter-spacing:.2px;
+}
+.tag:hover{background:rgba(212,175,55,.12);border-color:var(--gold-dim);color:var(--gold-light)}
+.tag.active{background:rgba(212,175,55,.18);border-color:var(--gold);color:var(--gold-light)}
+
+/* ── Buttons ───────────────────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.45rem;
+  font-family:inherit;font-weight:700;font-size:.85rem;letter-spacing:.3px;
+  padding:.73rem 1.5rem;border-radius:var(--radius-sm);
+  cursor:pointer;border:none;outline:none;
+  transition:all .2s;white-space:nowrap;
+}
+.btn-gold{
+  background:linear-gradient(135deg,#8a6a10,var(--gold) 50%,#8a6a10);
+  background-size:200% 100%;background-position:0% 0%;
+  color:#0a0800;
+  box-shadow:0 3px 16px rgba(212,175,55,.28),0 1px 0 rgba(255,255,255,.1) inset;
+}
+.btn-gold:hover{
+  background-position:100% 0%;
+  transform:translateY(-1px);
+  box-shadow:0 6px 24px rgba(212,175,55,.4);
+}
+.btn-gold:active{transform:translateY(0)}
+.btn-gold:disabled{opacity:.38;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-outline{
+  background:rgba(212,175,55,.05);
+  border:1px solid var(--border);
+  color:var(--gold);
+  font-weight:600;
+}
+.btn-outline:hover{border-color:var(--gold-dim);background:rgba(212,175,55,.1);color:var(--gold-light)}
+
+/* ── Progress ──────────────────────────────────────── */
+.progress-section{display:none;margin-bottom:2rem}
+.progress-section.active{display:block}
+.progress-card{
+  background:var(--glass);border:1px solid var(--border);
+  border-radius:var(--radius);padding:1.5rem;
+  box-shadow:var(--shadow);position:relative;overflow:hidden;
+}
+.progress-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent 10%,var(--gold-dim) 40%,var(--gold-dim) 60%,transparent 90%);
+}
+.phase-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem;flex-wrap:wrap;gap:.5rem}
+.phase-label{font-size:.88rem;font-weight:600;color:var(--text);display:flex;align-items:center;gap:.5rem}
+.phase-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--gold);box-shadow:0 0 7px var(--gold);
+  animation:gpulse 1.5s ease-in-out infinite;flex-shrink:0;
+}
+@keyframes gpulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.55)}}
+.phase-count{font-size:.78rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.progress-bar-track{
+  width:100%;height:5px;border-radius:99px;
+  background:rgba(212,175,55,.07);overflow:hidden;
+}
+.progress-bar{
+  height:100%;width:0%;border-radius:99px;
+  background:linear-gradient(90deg,var(--gold-dim),var(--gold),var(--gold-light));
+  transition:width .5s cubic-bezier(.4,0,.2,1);
+}
+.log-box{
+  margin-top:1rem;
+  background:rgba(0,0,0,.45);border-radius:var(--radius-sm);
+  padding:.6rem .85rem;max-height:120px;overflow-y:auto;
+  font-size:.74rem;color:var(--muted);line-height:1.85;
+  border:1px solid rgba(212,175,55,.08);
+  font-family:'Courier New',monospace;
+}
+.log-box::-webkit-scrollbar{width:3px}
+.log-box::-webkit-scrollbar-track{background:transparent}
+.log-box::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+.log-box p{margin-bottom:1px}
+.log-box .log-err{color:var(--danger)}
+.log-box .log-ok{color:var(--success)}
+
+/* ── Results ────────────────────────────────────────── */
+.results-section{display:none}
+.results-section.active{display:block}
+.results-card{
+  background:var(--glass);border:1px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;
+  box-shadow:var(--shadow);position:relative;
+}
+.results-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent 10%,var(--gold-dim) 40%,rgba(212,175,55,.55) 50%,var(--gold-dim) 60%,transparent 90%);
+}
+.results-toolbar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:1.15rem 1.5rem;border-bottom:1px solid var(--border);
+  flex-wrap:wrap;gap:.75rem;
+}
+.toolbar-left{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
+.results-toolbar h2{font-size:1rem;font-weight:700;color:var(--gold-light);letter-spacing:-.2px}
+.badge{
+  display:inline-flex;align-items:center;
+  background:rgba(212,175,55,.1);border:1px solid rgba(212,175,55,.25);
+  border-radius:99px;padding:.16rem .65rem;
+  font-size:.67rem;color:var(--gold);font-weight:700;letter-spacing:.5px;
+}
+.info-pill{
+  font-size:.67rem;color:var(--muted);
+  background:rgba(255,255,255,.025);border:1px solid rgba(212,175,55,.1);
+  border-radius:99px;padding:.16rem .65rem;letter-spacing:.2px;
+}
+
+/* ── Table ─────────────────────────────────────────── */
+.table-wrap{overflow-x:auto}
+.table-wrap::-webkit-scrollbar{height:4px}
+.table-wrap::-webkit-scrollbar-track{background:transparent}
+.table-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+table{width:100%;border-collapse:collapse;font-size:.79rem}
+thead{background:rgba(212,175,55,.035)}
+th{
+  text-align:left;padding:.65rem 1rem;
+  font-weight:700;color:var(--gold-dim);
+  text-transform:uppercase;letter-spacing:.8px;
+  font-size:.6rem;white-space:nowrap;
+  border-bottom:1px solid var(--border);
+}
+td{padding:.6rem 1rem;border-top:1px solid rgba(212,175,55,.045);vertical-align:middle}
+tr{transition:background .12s}
+tr:hover td{background:rgba(212,175,55,.035)}
+.phone-col{
+  white-space:nowrap;font-variant-numeric:tabular-nums;
+  color:var(--gold-light);font-size:.77rem;letter-spacing:.3px;
+}
+.name-cell strong{font-weight:600;font-size:.83rem}
+.cat-pill{
+  display:inline-block;padding:.13rem .52rem;border-radius:99px;
+  font-size:.63rem;font-weight:700;letter-spacing:.4px;text-transform:capitalize;
+  background:rgba(212,175,55,.09);border:1px solid rgba(212,175,55,.22);color:var(--gold);
+}
+.web-link{color:var(--gold-light);font-size:.77rem}
+.no-data{color:var(--muted2);font-size:.77rem}
+.date-col{white-space:nowrap;color:var(--muted);font-size:.77rem}
+.num-col{color:var(--muted2);font-size:.73rem}
+
+/* ── Animations ────────────────────────────────────── */
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeSlideIn .3s cubic-bezier(.4,0,.2,1) both}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+
+/* ── Responsive ────────────────────────────────────── */
+@media(max-width:640px){
+  header h1{font-size:1.8rem}
+  th,td{padding:.48rem .6rem;font-size:.73rem}
+  .results-toolbar{padding:.9rem 1rem}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div class="logo-wrap">
+      <!-- Search icon -->
+      <svg width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+    </div>
+    <h1>Client Finder</h1>
+    <div class="header-rule"></div>
+    <p>Discover local businesses on Google Maps — extract phone, website &amp; export to CSV.</p>
+  </header>
+
+  <!-- Search Card -->
+  <div class="search-card">
+    <div class="card-label"><div class="card-label-bar"></div>Search Parameters</div>
+    <div class="fields-grid">
+
+      <!-- City -->
+      <div class="field">
+        <label>
+          <!-- Map pin icon -->
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          City / Area
+        </label>
+        <input id="cityInput" type="text" placeholder="e.g. Jaipur, Mumbai, Delhi" autocomplete="off" />
+      </div>
+
+      <!-- Referred By -->
+      <div class="field">
+        <label>
+          <!-- Person icon -->
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Referred By
+        </label>
+        <input id="referredInput" type="text" placeholder="Your name" autocomplete="off" />
+      </div>
+
+      <!-- Category -->
+      <div class="field">
+        <label>
+          <!-- Tag icon -->
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          Category
+        </label>
+        <input id="categoryInput" type="text" placeholder="e.g. Restaurant, Gym, Salon" autocomplete="off" />
+        <div class="quick-tags">
+          <span class="tag" onclick="setCategory(this,'Restaurant')">Restaurant</span>
+          <span class="tag" onclick="setCategory(this,'Gym')">Gym</span>
+          <span class="tag" onclick="setCategory(this,'Hotel')">Hotel</span>
+          <span class="tag" onclick="setCategory(this,'Salon')">Salon</span>
+          <span class="tag" onclick="setCategory(this,'Cafe')">Cafe</span>
+          <span class="tag" onclick="setCategory(this,'Clinic')">Clinic</span>
+          <span class="tag" onclick="setCategory(this,'Spa')">Spa</span>
+          <span class="tag" onclick="setCategory(this,'Bakery')">Bakery</span>
+        </div>
+      </div>
+
+      <!-- Generate -->
+      <button class="btn btn-gold" id="searchBtn" onclick="startSearch()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Generate Leads
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-section" id="progressSection">
+    <div class="progress-card">
+      <div class="phase-row">
+        <div class="phase-label">
+          <span class="phase-dot" id="phaseDot"></span>
+          <span id="phaseLabel">Initialising...</span>
+        </div>
+        <span class="phase-count" id="progressCount"></span>
+      </div>
+      <div class="progress-bar-track"><div class="progress-bar" id="progressBar"></div></div>
+      <div class="log-box" id="logBox"></div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="results-section" id="resultsSection">
+    <div class="results-card">
+      <div class="results-toolbar">
+        <div class="toolbar-left">
+          <h2>Leads</h2>
+          <span class="badge" id="countBadge">0 results</span>
+          <span class="info-pill" id="searchInfoPill"></span>
+        </div>
+        <button class="btn btn-outline" id="downloadBtn" onclick="downloadCsv()" style="display:none">
+          <!-- Download icon -->
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download CSV
+        </button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Business Name</th>
+              <th>Client Name</th>
+              <th>Location</th>
+              <th>Phone</th>
+              <th>Date</th>
+              <th>Referred By</th>
+              <th>Service</th>
+              <th>Status</th>
+              <th>Amount &#8377;</th>
+              <th>Category</th>
+              <th>Website</th>
+              <th>Real Location</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let rowIndex = 0;
+let currentJobId = null;
+
+function setCategory(el, cat) {
+  $('categoryInput').value = cat;
+  document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+$('categoryInput').addEventListener('input', () => {
+  const val = $('categoryInput').value.trim().toLowerCase();
+  document.querySelectorAll('.tag').forEach(t => {
+    t.classList.toggle('active', t.textContent.trim().toLowerCase() === val);
+  });
+});
+
+function startSearch() {
+  const city     = $('cityInput').value.trim();
+  const referred = $('referredInput').value.trim();
+  const category = $('categoryInput').value.trim();
+
+  let valid = true;
+  [$('cityInput'), $('referredInput'), $('categoryInput')].forEach(el => el.classList.remove('invalid'));
+
+  if (!city)     { markInvalid('cityInput');     valid = false; }
+  if (!referred) { markInvalid('referredInput'); valid = false; }
+  if (!category) { markInvalid('categoryInput'); valid = false; }
+  if (!valid) return;
+
+  $('searchBtn').disabled = true;
+  $('downloadBtn').style.display = 'none';
+  $('progressSection').classList.add('active');
+  $('resultsSection').classList.remove('active');
+  $('logBox').innerHTML = '';
+  $('tableBody').innerHTML = '';
+  $('progressBar').style.width = '0%';
+  $('phaseLabel').textContent = 'Initialising...';
+  $('progressCount').textContent = '';
+  $('phaseDot').style.cssText = '';
+  rowIndex = 0;
+  currentJobId = null;
+
+  $('searchInfoPill').textContent = `${category}  ·  ${city}`;
+
+  fetch('/search', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ city, referred_by: referred, category })
+  })
+  .then(r => {
+    if (!r.ok) return r.json().then(d => { throw new Error(d.error || 'Request failed'); });
+    return r.json();
+  })
+  .then(d => { currentJobId = d.job_id; listenSSE(d.job_id); })
+  .catch(err => {
+    addLog(err.message, 'log-err');
+    $('searchBtn').disabled = false;
+  });
+}
+
+function listenSSE(jobId) {
+  const es = new EventSource('/stream/' + encodeURIComponent(jobId));
+  let total = 0;
+
+  es.addEventListener('log', e => addLog(e.data));
+  es.addEventListener('phase', e => {
+    const map = { scrolling: 'Scrolling and collecting links...', extracting: 'Extracting business details...' };
+    $('phaseLabel').textContent = map[e.data] || e.data;
+  });
+  es.addEventListener('total', e => { total = parseInt(e.data, 10); });
+  es.addEventListener('progress', e => {
+    const p = JSON.parse(e.data);
+    const pct = Math.round((p.current / (total || 30)) * 100);
+    $('progressBar').style.width = pct + '%';
+    $('progressCount').textContent = `${p.current} / ${total || '?'}`;
+    $('phaseLabel').textContent = `Extracting: ${p.name}`;
+  });
+  es.addEventListener('row', e => {
+    appendRow(JSON.parse(e.data));
+    $('resultsSection').classList.add('active');
+    $('countBadge').textContent = rowIndex + ' results';
+  });
+  es.addEventListener('done', e => {
+    es.close();
+    const d = JSON.parse(e.data);
+    $('progressBar').style.width = '100%';
+    $('phaseDot').style.cssText = 'animation:none;background:var(--success);box-shadow:0 0 7px var(--success)';
+    $('phaseLabel').textContent = 'Complete';
+    $('progressCount').textContent = `${d.count} leads found`;
+    addLog(`Finished — ${d.count} leads extracted.`, 'log-ok');
+    $('countBadge').textContent = d.count + ' results';
+    $('downloadBtn').style.display = 'inline-flex';
+    $('searchBtn').disabled = false;
+  });
+  es.addEventListener('error', e => {
+    es.close();
+    addLog(e.data, 'log-err');
+    $('phaseDot').style.cssText = 'animation:none;background:var(--danger);box-shadow:none';
+    $('phaseLabel').textContent = 'Error';
+    $('searchBtn').disabled = false;
+  });
+  es.onerror = () => {
+    es.close();
+    addLog('Connection lost.', 'log-err');
+    $('searchBtn').disabled = false;
+  };
+}
+
+function appendRow(r) {
+  rowIndex++;
+  const tr = document.createElement('tr');
+  tr.className = 'fade-in';
+  const websiteCell = r['Website']
+    ? `<a class="web-link" href="${escHtml(r['Website'])}" target="_blank" rel="noopener">${truncate(r['Website'], 34)}</a>`
+    : `<span class="no-data">—</span>`;
+  tr.innerHTML = `
+    <td class="num-col">${rowIndex}</td>
+    <td class="name-cell"><strong>${escHtml(r['Business Name'])}</strong></td>
+    <td>${escHtml(r['Client Name']) || '<span class="no-data">—</span>'}</td>
+    <td>${escHtml(r['Location']) || '<span class="no-data">—</span>'}</td>
+    <td class="phone-col">${escHtml(r['Phone']) || '<span class="no-data">—</span>'}</td>
+    <td class="date-col">${escHtml(r['Date'])}</td>
+    <td>${escHtml(r['Referred By']) || '<span class="no-data">—</span>'}</td>
+    <td><span class="no-data">—</span></td>
+    <td><span class="no-data">—</span></td>
+    <td><span class="no-data">—</span></td>
+    <td><span class="cat-pill">${escHtml(r['Category'])}</span></td>
+    <td>${websiteCell}</td>
+    <td>${r['Real Location'] ? escHtml(r['Real Location']) : '<span class="no-data">—</span>'}</td>`;
+  $('tableBody').appendChild(tr);
+}
+
+function addLog(msg, cls) {
+  const p = document.createElement('p');
+  if (cls) p.className = cls;
+  p.textContent = '> ' + msg;
+  $('logBox').appendChild(p);
+  $('logBox').scrollTop = $('logBox').scrollHeight;
+}
+
+function markInvalid(id) {
+  const el = $(id);
+  el.classList.add('invalid');
+  el.focus();
+  el.addEventListener('input', () => el.classList.remove('invalid'), { once: true });
+}
+
+function downloadCsv() {
+  if (currentJobId) window.location = '/download/' + encodeURIComponent(currentJobId);
+}
+
+function escHtml(s) {
+  if (!s) return '';
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+function truncate(s, n) { return s.length > n ? s.slice(0, n) + '...' : s; }
+
+['cityInput','referredInput','categoryInput'].forEach(id =>
+  $(id).addEventListener('keydown', e => { if (e.key === 'Enter') startSearch(); })
+);
+</script>
+</body>
+</html>
