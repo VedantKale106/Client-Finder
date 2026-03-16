@@ -114,6 +114,9 @@ def _scrape_detail_page(page, url: str):
         if p.count():
             aria = p.first.get_attribute("aria-label") or ""
             phone = aria.replace("Phone:", "").replace("Phone", "").strip().lstrip(":")
+            # Remove leading zero if present
+            if phone.startswith("0"):
+                phone = phone.lstrip("0")
 
         # Website – prefer the anchor tag
         w = page.locator("a[data-item-id='authority']")
@@ -234,6 +237,7 @@ def _run_scraper(city: str, referred_by: str, category: str, job_id: str):
                     "Category":       category,
                     "Website":        website,
                     "Real Location":  address,
+                    "Maps Link":      place_url,
                 }
                 results.append(row)
                 emit("row", json.dumps(row))
@@ -329,7 +333,7 @@ def download(job_id):
     cols = [
         "Business Name", "Client Name", "Location", "Phone",
         "Date", "Referred By", "Service", "Status", "Amount ₹",
-        "Category", "Website", "Real Location",
+        "Category", "Website", "Real Location", "Maps Link",
     ]
 
     buf = io.StringIO()

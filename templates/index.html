@@ -405,6 +405,7 @@ tr:hover td{background:rgba(212,175,55,.035)}
               <th>Category</th>
               <th>Website</th>
               <th>Real Location</th>
+              <th>Maps Link</th>
             </tr>
           </thead>
           <tbody id="tableBody"></tbody>
@@ -545,7 +546,8 @@ function appendRow(r) {
     <td><span class="no-data">—</span></td>
     <td><span class="cat-pill">${escHtml(r['Category'])}</span></td>
     <td>${websiteCell}</td>
-    <td>${r['Real Location'] ? escHtml(r['Real Location']) : '<span class="no-data">—</span>'}</td>`;
+    <td>${r['Real Location'] ? escHtml(r['Real Location']) : '<span class="no-data">—</span>'}</td>
+    <td><a class="web-link" href="${escHtml(r['Maps Link'])}" target="_blank" rel="noopener">View Map</a></td>`;
   $('tableBody').appendChild(tr);
 }
 
