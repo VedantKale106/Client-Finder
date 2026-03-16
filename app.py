@@ -244,8 +244,18 @@ def _run_scraper(city: str, referred_by: str, category: str, job_id: str):
 
             browser.close()
 
-        # Sort: entries with website first, then without
-        results.sort(key=lambda r: (0 if r.get("Website") else 1))
+        # Sort by website availability first, then by phone availability.
+        # Within each website group, entries without a phone appear first.
+        def has_value(val):
+            txt = (val or "").strip().lower()
+            return txt not in ("", "n/a", "na", "none", "null", "-")
+
+        results.sort(
+            key=lambda r: (
+                0 if has_value(r.get("Website")) else 1,
+                0 if not has_value(r.get("Phone")) else 1,
+            )
+        )
 
         results_store[job_id] = results
         status_store[job_id] = "done"
